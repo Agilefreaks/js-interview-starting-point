@@ -12,14 +12,19 @@ This repo will serve as a starting point for your code challenge. Feel free to c
 ## Commands
 
 ```
-yarn run start  # Run the main script
-         dev    # Start development mode 
-         test   # Test the code
+yarn (to install the dependecies)
+ng serve
+visit localhost:4200
+Enjoy!
 ````
 ## Tools
 
 - Write modern JS with [babel/preset-env](https://www.npmjs.com/package/@babel/preset-env)
 - Test your code with [jest](https://www.npmjs.com/package/jest)
+- Tailwind CSS
+- rxjs 7 
+- Angular 13
+- SCSS 
 
 ---
 
