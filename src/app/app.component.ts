@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CoffeeShopsService } from './services/coffeeShops.service';
-import {  retry, switchMap } from 'rxjs';
+import { retry, switchMap } from 'rxjs';
 import { CoffeeShopModel } from './models/coffeeShop.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -32,26 +32,22 @@ export class AppComponent implements OnInit {
   }
 
   getNearbyCS(): void {
+    const userLocation = { x: this.coordinatesFormControl.value.xCoordinate, y: this.coordinatesFormControl.value.yCoordinate };
     for (let coffeeShop of this.coffeeShops) {
-      coffeeShop.distanceFromUser = Number(this.distance(this.coordinatesFormControl.value.xCoordinate, this.coordinatesFormControl.value.yCoordinate,
-        Number(coffeeShop.x), Number(coffeeShop.y)));
+      coffeeShop.distanceFromUser = Number(this.distance({ x: coffeeShop.x, y: coffeeShop.y }, userLocation));
     }
     this.coffeeShops.sort((a: CoffeeShopModel, b: CoffeeShopModel): number => a.distanceFromUser - b.distanceFromUser);
     this.coffeeShops = this.coffeeShops.slice(0, 3);
   }
 
-  distance(x1: number, y1: number, x2: number, y2: number) {
-    const deltaX = this.diff(x1, x2);
-    const deltaY = this.diff(y1, y2);
+  distance(coffeeShop: { x: number, y: number }, userLocation: { x: number, y: number }) {
+    const deltaX = this.diff(coffeeShop.x, userLocation.x);
+    const deltaY = this.diff(coffeeShop.y, userLocation.y);
     const dist = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2)).toFixed(4);
     return (dist);
   };
 
-  diff(num1: any, num2: any) {
-    if (num1 > num2) {
-      return (num1 - num2);
-    } else {
-      return (num2 - num1);
-    }
+  diff(num1: number, num2: number): number {
+    return num1 > num2 ? num1 - num2 : num2 - num1;
   };
 }

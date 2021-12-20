@@ -3,7 +3,7 @@ export interface CoffeeShopModel {
   created_at: Date,
   updated_at: Date,
   name: string,
-  x: string,
-  y: string,
+  x: number,
+  y: number,
   distanceFromUser: number;
 }
