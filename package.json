@@ -21,5 +21,8 @@
     "jest": "^27.1.0",
     "nodemon": "^2.0.13"
   },
-  "dependencies": {}
+  "dependencies": {
+    "axios": "^0.24.0",
+    "euclidean-distance": "^1.0.0"
+  }
 }
