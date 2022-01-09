@@ -1,26 +1,17 @@
-# Javascript Interview Starting Point
+# Coffee shop distance calculator
 
-This repo will serve as a starting point for your code challenge. Feel free to change anything in order to complete it: Add modules, other tests, new packages etc.
+This application receives x and y axes of coordinates as command line arguments. It calculates and returns a list of three closest shops in relation to the given coordinates.
 
-## Steps
+## How to use
 
-- Fork this repo
-- Clone your fork
-- Finish the exercise
-- Push your best work
+In order to run the application you must give x and y coordinates in number format as command line arguments.
 
-## Commands
-
+```sh
+node src/index.js <x coordinate> <y coordinate>
 ```
-yarn run start  # Run the main script
-         dev    # Start development mode 
-         test   # Test the code
-````
-## Tools
 
-- Write modern JS with [babel/preset-env](https://www.npmjs.com/package/@babel/preset-env)
-- Test your code with [jest](https://www.npmjs.com/package/jest)
+**Example:**
 
----
-
-Good luck!
+```sh
+node src/index.js 28.122 -123.11
+```
