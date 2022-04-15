@@ -1,3 +1,8 @@
 import { getNearestShops } from './app.js';
 
-getNearestShops();
+const position = {
+    lat: process.argv[2],
+    lng: process.argv[3]
+}
+
+getNearestShops(position);
