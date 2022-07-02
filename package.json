@@ -25,6 +25,6 @@
     "ts-jest": "^28.0.5"
   },
   "dependencies": {
-    "node-fetch": "^3.2.6"
+    "node-fetch": "^2.6.7"
   }
 }
