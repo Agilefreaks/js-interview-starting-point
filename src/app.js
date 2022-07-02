@@ -1,3 +1,4 @@
+import errorCodes from "./errorcodes.js";
 import fetch from "node-fetch";
 import SortedDeltaCoffeeShopList from "./sortedDeltaCoffeeShopList.js";
 
@@ -33,6 +34,12 @@ async function fetchToken() {
  * @returns {Array<position>}
  */
 export async function getNearestShops(position) {
+  // Check if we received numbers as arguments
+  if (isNaN(position.x) || isNaN(position.y)) {
+    console.log("Invalid input: numbers expected");
+    return [errorCodes.INVALID_INPUT_ARGS_NAN];
+  }
+
   // Get token
   let token = await fetchToken();
 
