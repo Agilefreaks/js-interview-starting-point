@@ -1,5 +1,5 @@
 import { getNearestShops } from "./app.js";
-import errorCodes from "./errorcodes.js"
+import errorCodes from "./errorcodes.js";
 
 // Get command arguments
 const args = process.argv.slice(2);

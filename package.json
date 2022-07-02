@@ -22,5 +22,8 @@
     "babel-jest": "27.4.6",
     "jest": "27.4.6",
     "nodemon": "2.0.15"
+  },
+  "dependencies": {
+    "node-fetch": "^3.2.6"
   }
 }
