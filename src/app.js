@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import SortedDeltaCoffeeShopList from "./sortedDeltaCoffeeShopList.js";
 
 // Token URLs
 const TOKEN_URL = "https://blue-bottle-api-test.herokuapp.com/v1/tokens";
@@ -14,7 +15,7 @@ async function fetchToken() {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json"
+      Accept: "application/json",
     },
   })
     .then((response) => response.json())
@@ -36,7 +37,7 @@ export async function getNearestShops(position) {
   let token = await fetchToken();
 
   // Get coffee shops list
-  let coffeeShopsData;
+  let coffeeShops;
   await fetch(
     COFFEE_SHOPS_URL +
       new URLSearchParams({
@@ -50,7 +51,17 @@ export async function getNearestShops(position) {
     }
   )
     .then((response) => response.json())
-    .then((json) => (coffeeShopsData = json));
+    .then((json) => (coffeeShops = json));
 
-  return [];
+  // Create a sorted coffee shop list, relative to our position
+  let sortedDeltaCoffeShopList = new SortedDeltaCoffeeShopList(
+    coffeeShops,
+    position.x,
+    position.y
+  );
+
+  // Get the closest 3 coffee shops
+  const closestCoffeeShops = sortedDeltaCoffeShopList.getNClosestCoffeShops(3);
+  console.log(closestCoffeeShops);
+  return closestCoffeeShops;
 }
