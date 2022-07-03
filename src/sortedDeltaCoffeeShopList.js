@@ -1,6 +1,10 @@
 import DeltaCoffeeShopList from "./deltaCoffeeShopList.js";
 
-/** A list of delta coffee shops kept in ascending order */
+/**
+ * A list of delta coffee shops kept in ascending order.
+ * A delta coffee shop is a coffee shop which also stores the distance
+ * between its position and the given position in a variable named delta
+ */
 class SortedDeltaCoffeShopList extends DeltaCoffeeShopList {
 
   /**
