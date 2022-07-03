@@ -45,6 +45,16 @@ class DeltaCoffeeShop {
   get name() {
     return this._coffeeShop.name;
   }
+
+  /** Getter for X coordinate */
+  get x() {
+    return this._coffeeShop.x;
+  }
+
+  /** Getter for Y coordinate */
+  get y() {
+    return this._coffeeShop.y;
+  }
 }
 
 export default DeltaCoffeeShop;
