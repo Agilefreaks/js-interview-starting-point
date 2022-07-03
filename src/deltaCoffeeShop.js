@@ -12,7 +12,6 @@ class DeltaCoffeeShop {
     this._coffeeShop = coffeeShop;
     this._currentX = currentX;
     this._currentY = currentY;
-    _delta: 0;
     this.CalculateDelta();
   }
 
