@@ -1,3 +1,4 @@
+/** @const ErrorCodes Error code enumeration */
 const ErrorCodes = {
     GENERIC_ERROR: 0,
     INVALID_INPUT_ARGS_NAN: 1,

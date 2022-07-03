@@ -3,13 +3,16 @@ import { errorResponse } from "./utils.js";
 import fetch from "node-fetch";
 import SortedDeltaCoffeeShopList from "./sortedDeltaCoffeeShopList.js";
 
-// Globals
+/** @const {String} TOKEN_URL url for fetching the token */
 const TOKEN_URL = "https://blue-bottle-api-test.herokuapp.com/v1/tokens";
+
+/** @const {String} COFFEE_SHOPS_URL url for fetching the coffee shops */
 const COFFEE_SHOPS_URL =
   "https://blue-bottle-api-test.herokuapp.com/v1/coffee_shops?";
 
 /**
- *
+ * Fetch the token from the API
+ * 
  * @returns {String} token
  */
 async function fetchToken() {
@@ -28,6 +31,8 @@ async function fetchToken() {
 }
 
 /**
+ * Get the 3 closest coffee shops relative to current position
+ * 
  * @param {Object} position
  * @param {Number} position.x
  * @param {Number} position.y
@@ -41,10 +46,10 @@ export async function getNearestShops(position) {
     return errorResponse(errorCodes.INVALID_INPUT_ARGS_NAN);
   }
 
-  // Get token
+  // Get the token
   let token = await fetchToken();
 
-  // Get coffee shops list
+  // Get the coffee shops list
   let coffeeShops;
   let responseCode;
   await fetch(
