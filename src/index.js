@@ -10,3 +10,8 @@ if (shops[0] == ERROR_TOKEN) {
   console.log("Operation failed. Error Code: " + shops[1]);
   process.exit();
 }
+
+// Log the 3 closest coffee shops
+shops.forEach(function (coffeeShop) {
+  console.log(coffeeShop.name + ", " + coffeeShop.delta);
+});
