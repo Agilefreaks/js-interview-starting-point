@@ -1,4 +1,5 @@
 import errorCodes from "./errorcodes.js";
+import { errorResponse } from "./utils.js";
 import fetch from "node-fetch";
 import SortedDeltaCoffeeShopList from "./sortedDeltaCoffeeShopList.js";
 
@@ -37,7 +38,7 @@ export async function getNearestShops(position) {
   // Check if we received numbers as arguments
   if (isNaN(position.x) || isNaN(position.y)) {
     console.log("Invalid input: numbers expected");
-    return [errorCodes.INVALID_INPUT_ARGS_NAN];
+    return errorResponse(errorCodes.INVALID_INPUT_ARGS_NAN);
   }
 
   // Get token
@@ -68,35 +69,40 @@ export async function getNearestShops(position) {
   switch (responseCode) {
     case 200:
       break;
+
     case 401:
       console.log(
         "Failed fetching coffee shops list - Unauthorized. Error code: " +
           responseCode
       );
-      return [errorCodes.UNAUTHORIZED];
+      return errorResponse(errorCodes.UNAUTHORIZED);
+
     case 406:
       console.log(
         "Failed fetching coffee shops list - Unacceptable Accept format. Error code: " +
           responseCode
       );
-      return [errorCodes.UNACCEPTABLE_ACCEPT_FORMAT];
+      return errorResponse(errorCodes.UNACCEPTABLE_ACCEPT_FORMAT);
+
     case 503:
       console.log(
         "Failed fetching coffee shops list - Service Unavailable. Error code: " +
           responseCode
       );
-      return [errorCodes.SERVICE_UNAVAILABLE];
+      return errorResponse(errorCodes.SERVICE_UNAVAILABLE);
+
     case 504:
       console.log(
         "Failed fetching coffee shops list - Timeout. Error code: " +
           responseCode
       );
-      return [errorCodes.TIMEOUT];
+      return errorResponse(errorCodes.TIMEOUT);
+
     default:
       console.log(
         "Failed fetching coffee shops list. Error code: " + responseCode
       );
-      return [errorCodes.GENERIC_ERROR];
+      return errorResponse(errorCodes.GENERIC_ERROR);
   }
 
   // Create a sorted coffee shop list, relative to our position
