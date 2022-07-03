@@ -111,7 +111,7 @@ export async function getNearestShops(position) {
   }
 
   // Create a sorted coffee shop list, relative to our position
-  let sortedDeltaCoffeShopList = new SortedDeltaCoffeeShopList(
+  const sortedDeltaCoffeShopList = new SortedDeltaCoffeeShopList(
     coffeeShops,
     position.x,
     position.y
