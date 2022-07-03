@@ -45,6 +45,7 @@ export async function getNearestShops(position) {
 
   // Get coffee shops list
   let coffeeShops;
+  let resposeCode;
   await fetch(
     COFFEE_SHOPS_URL +
       new URLSearchParams({
@@ -57,7 +58,10 @@ export async function getNearestShops(position) {
       },
     }
   )
-    .then((response) => response.json())
+    .then((response) => {
+      resposeCode = response.status;
+      return response.json();
+    })
     .then((json) => (coffeeShops = json));
 
   // Create a sorted coffee shop list, relative to our position
