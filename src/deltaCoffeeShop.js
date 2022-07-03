@@ -28,7 +28,7 @@ class DeltaCoffeeShop {
     );
 
     // Round to two decimals
-    this.delta = parseFloat(this.delta).toFixed(4);
+    this.delta = parseFloat(parseFloat(this.delta).toFixed(4));
   }
 
   /** Getter for the delta value */

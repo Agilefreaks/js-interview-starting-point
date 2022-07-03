@@ -42,7 +42,7 @@ class SortedDeltaCoffeShopList extends DeltaCoffeeShopList {
     for (let i = 0; i < n; i++) {
       let coffeeShop = {
         name: slicedArray[i].name,
-        delta: parseFloat(slicedArray[i].delta),
+        delta: slicedArray[i].delta,
       };
       closestCoffeeShops.push(coffeeShop);
     }
