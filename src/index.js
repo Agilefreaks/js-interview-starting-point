@@ -9,7 +9,7 @@ const position = { x: args[1], y: args[2] };
 const shops = await getNearestShops(position);
 
 // Notify and exit if error occurred
-if (shops[0] == ERROR_TOKEN) {
+if (shops[0] === ERROR_TOKEN) {
   console.log("Operation failed. Error Code: " + shops[1]);
   process.exit();
 }
