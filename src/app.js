@@ -64,6 +64,41 @@ export async function getNearestShops(position) {
     })
     .then((json) => (coffeeShops = json));
 
+  // Handle different response codes
+  switch (responseCode) {
+    case 200:
+      break;
+    case 401:
+      console.log(
+        "Failed fetching coffee shops list - Unauthorized. Error code: " +
+          responseCode
+      );
+      return [];
+    case 406:
+      console.log(
+        "Failed fetching coffee shops list - Unacceptable Accept format. Error code: " +
+          responseCode
+      );
+      return [];
+    case 503:
+      console.log(
+        "Failed fetching coffee shops list - Service Unavailable. Error code: " +
+          responseCode
+      );
+      return [];
+    case 504:
+      console.log(
+        "Failed fetching coffee shops list - Timeout. Error code: " +
+          responseCode
+      );
+      return [];
+    default:
+      console.log(
+        "Failed fetching coffee shops list. Error code: " + responseCode
+      );
+      return [];
+  }
+
   // Create a sorted coffee shop list, relative to our position
   let sortedDeltaCoffeShopList = new SortedDeltaCoffeeShopList(
     coffeeShops,
