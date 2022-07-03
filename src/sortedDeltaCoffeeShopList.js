@@ -34,6 +34,16 @@ class SortedDeltaCoffeShopList extends DeltaCoffeeShopList {
       n = this._deltaCoffeeShops.length;
     }
 
+    // Exit if N is too small
+    if ( n <= 0) {
+      return [];
+    }
+
+    // Exit if N is NaN
+    if (isNaN(n)) {
+      return [];
+    }
+
     // Local vars
     let slicedArray = this._deltaCoffeeShops.slice(0, n);
     let closestCoffeeShops = [];
