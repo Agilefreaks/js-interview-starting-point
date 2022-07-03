@@ -27,7 +27,7 @@ class DeltaCoffeeShop {
       Math.pow(x - this._currentX, 2) + Math.pow(y - this._currentY, 2)
     );
 
-    // Round to two decimals
+    // Round to four decimals
     this.delta = parseFloat(parseFloat(this.delta).toFixed(4));
   }
 
