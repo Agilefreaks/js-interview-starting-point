@@ -2,7 +2,7 @@ import errorCodes from "./errorcodes.js";
 import fetch from "node-fetch";
 import SortedDeltaCoffeeShopList from "./sortedDeltaCoffeeShopList.js";
 
-// Token URLs
+// Globals
 const TOKEN_URL = "https://blue-bottle-api-test.herokuapp.com/v1/tokens";
 const COFFEE_SHOPS_URL =
   "https://blue-bottle-api-test.herokuapp.com/v1/coffee_shops?";
