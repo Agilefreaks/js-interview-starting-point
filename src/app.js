@@ -118,6 +118,5 @@ export async function getNearestShops(position) {
   );
 
   // Get the closest 3 coffee shops
-  const closestCoffeeShops = sortedDeltaCoffeShopList.getNClosestCoffeShops(3);
-  return closestCoffeeShops;
+  return sortedDeltaCoffeShopList.getNClosestCoffeShops(3);
 }
