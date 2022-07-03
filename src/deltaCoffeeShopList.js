@@ -16,7 +16,7 @@ class DeltaCoffeeShopList {
     this._currentY = currentY;
 
     for (let i = 0; i < coffeeShops.length; i++) {
-      let deltaCoffeeShop = new DeltaCoffeeShop(
+      const deltaCoffeeShop = new DeltaCoffeeShop(
         coffeeShops[i],
         currentX,
         currentY
