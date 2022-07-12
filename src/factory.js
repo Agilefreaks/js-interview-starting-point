@@ -25,7 +25,7 @@ export class Factory {
     }
 
     /**
-     * @return {module:app.getNearestShops}
+     * @returns {App.getNearestShops}
      */
     nearestCoffeeShops() {
         const fetchShops = this.fetchCoffeeShopList();
@@ -36,7 +36,7 @@ export class Factory {
     }
 
     /**
-     * @return {module:app.fetchShopList}
+     * @returns {App.fetchShopList}
      */
     fetchCoffeeShopList() {
         const fetchCoffeeShopAPIToken = this.fetchCoffeeShopAPIToken();
@@ -46,30 +46,29 @@ export class Factory {
     }
 
     /**
-     * @return {module:app.fetchCoffeeShops}
+     * @returns {App.fetchCoffeeShops}
      */
     fetchCoffeeShops() {
         const { host, coffeeShopsPath } = this.config;
         const httpFetch = this.httpFetch();
-        return App.fetchCoffeeShopsFactory(host, coffeeShopsPath, httpFetch);
+        const parseCoffeeShops = this.parseCoffeeShops()
+        return App.fetchCoffeeShopsFactory(host, coffeeShopsPath, httpFetch, parseCoffeeShops);
     }
 
-    /**
-     * @return {module:coffeeShop.shopDistanceTo}
-     */
+    parseCoffeeShops() {
+        return App.parseCoffeeShops
+    }
+
     shopDistanceTo() {
         return CoffeeShop.shopDistanceTo;
     }
 
-    /**
-     * @return {module:coffeeShop.distanceAsc}
-     */
     distanceAsc() {
         return CoffeeShop.distanceAsc;
     }
 
     /**
-     * @return {module:app.fetchCoffeeShopAPIToken}
+     * @returns {App.fetchAPIToken}
      */
     fetchCoffeeShopAPIToken() {
         const { host, tokenPath } = this.config;
@@ -78,22 +77,23 @@ export class Factory {
     }
 
     /**
-     * @return {module:IO.httpFetch}
+     * @template T
+     * @returns {IO.httpFetch<T>}
      */
     httpFetch() {
-        return IO.httpFetchFactory(this.https(), this.resolveJsonResponse());
+        const resolveRequestOptions = this.resolveJsonRequestOptions()
+        const resolveResponse = this.resolveJsonResponse()
+        return IO.httpFetchFactory(this.https(), resolveResponse, resolveRequestOptions);
     }
 
-    /**
-     * @return {external:https}
-     */
+    resolveJsonRequestOptions() {
+        return IO.resolveJsonRequestOptions;
+    }
+
     https() {
         return https;
     }
 
-    /**
-     * @return {module.IO.resolveJsonResponseFactory}
-     */
     resolveJsonResponse() {
         return IO.resolveJsonResponseFactory;
     }

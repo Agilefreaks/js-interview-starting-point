@@ -1,9 +1,9 @@
-import { httpFetchFactory, resolveJsonResponseFactory } from '../src/io.js';
+import { httpFetchFactory, resolveJsonRequestOptions, resolveJsonResponseFactory } from '../src/io.js';
 
 describe('io.js', () => {
 
     describe('httpFetch()', () => {
-        let request, https, resolveJsonResponse;
+        let request, https, resolveResponse, resolveRequestOptions;
         beforeEach(() => {
             request = {
                 on: jest.fn(),
@@ -16,16 +16,16 @@ describe('io.js', () => {
                     return request;
                 })
             };
-            resolveJsonResponse = jest.fn(() => () => { });
+            resolveResponse = jest.fn(() => () => { });
+            resolveRequestOptions = jest.fn((options) => options);
         });
 
         it('makes a simple https request', () => {
             expect.assertions(1);
-            resolveJsonResponse = jest.fn((resolve) => () => {
+            resolveResponse = jest.fn((resolve) => () => {
                 resolve({ foo: 'bar' });
             });
-
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
+            const fetch = httpFetchFactory(https, resolveResponse, resolveRequestOptions);
 
             return fetch('', {}).then(data => {
                 expect(data).toEqual({ foo: 'bar' });
@@ -33,7 +33,7 @@ describe('io.js', () => {
         });
 
         it('makes a https post', () => {
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
+            const fetch = httpFetchFactory(https, resolveResponse, resolveRequestOptions);
 
             fetch('', {}, 'some data');
 
@@ -42,7 +42,7 @@ describe('io.js', () => {
         });
 
         it('does not call request.write(data) if no data to send', () => {
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
+            const fetch = httpFetchFactory(https, resolveResponse, resolveRequestOptions);
 
             fetch('', {});
 
@@ -50,44 +50,27 @@ describe('io.js', () => {
         });
 
 
-        it('calls https.request with correct options on POST', () => {
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
+        it('calls https.request with correct options', () => {
             const options = { host: 'example.com', path: '/test', method: 'POST' };
+            resolveRequestOptions = jest.fn((options, data) => ({
+                ...options,
+                withCorrectOptionsAnd: data
+            }))
+            const fetch = httpFetchFactory(https, resolveResponse, resolveRequestOptions);
 
-            fetch('', options, 'some data');
+            fetch('', options, 'the data');
 
             expect(https.request.mock.calls.length).toBe(1);
             expect(https.request.mock.calls[0][0]).toEqual({
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Length': 9,
-                    'Content-Type': 'application/json'
-                },
+                withCorrectOptionsAnd: 'the data',
                 host: 'example.com',
                 method: 'POST',
                 path: '/test',
-                port: 443,
-            });
-        });
-
-        it('calls https.request with correct options on GET', () => {
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
-            const options = { host: 'example.com', path: '/test' };
-
-            fetch('', options);
-
-            expect(https.request.mock.calls.length).toBe(1);
-            expect(https.request.mock.calls[0][0]).toEqual({
-                headers: { 'Accept': 'application/json' },
-                host: 'example.com',
-                method: 'GET',
-                path: '/test',
-                port: 443,
             });
         });
 
         it('calls https.ClientRequest.end()', () => {
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
+            const fetch = httpFetchFactory(https, resolveResponse, resolveRequestOptions);
 
             const options = { host: 'example.com', path: '/test' };
             fetch('', options);
@@ -100,7 +83,7 @@ describe('io.js', () => {
             request.on = jest.fn((event, cb) => {
                 if (event === 'error') cb(new Error('expected error'));
             });
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
+            const fetch = httpFetchFactory(https, resolveResponse, resolveRequestOptions);
 
             const result = fetch('MyRequest', {});
 
@@ -110,12 +93,12 @@ describe('io.js', () => {
             });
         });
 
-        it('handles resolveJsonResponse error event', () => {
+        it('handles resolveResponse error event', () => {
             expect.assertions(1);
-            resolveJsonResponse = jest.fn((_, reject, name) => () => {
+            resolveResponse = jest.fn((_, reject, name) => () => {
                 reject(new Error(name + ': expected error'));
             });
-            const fetch = httpFetchFactory(https, resolveJsonResponse);
+            const fetch = httpFetchFactory(https, resolveResponse, resolveRequestOptions);
 
             const result = fetch('MyRequest', {});
 
@@ -187,7 +170,8 @@ describe('io.js', () => {
             expect.assertions(2);
             return new Promise((resolve, reject) => {
                 const resolveResponse = resolveJsonResponseFactory(resolve, reject, 'MyRequest');
-                let dataCallback, endCallback;
+                let dataCallback = (a) => { };
+                let endCallback = (a) => { };
                 response.on = jest.fn((event, cb) => {
                     if (event === 'data') dataCallback = cb;
                     if (event === 'end') endCallback = cb;
@@ -205,7 +189,8 @@ describe('io.js', () => {
             expect.assertions(1);
             return new Promise((resolve, reject) => {
                 const resolveResponse = resolveJsonResponseFactory(resolve, reject, 'MyRequest');
-                let dataCallback, endCallback;
+                let dataCallback = (a) => { };
+                let endCallback = (a) => { };
                 response.on = jest.fn((event, cb) => {
                     if (event === 'data') dataCallback = cb;
                     if (event === 'end') endCallback = cb;
@@ -223,7 +208,8 @@ describe('io.js', () => {
             expect.assertions(2);
             return new Promise((resolve, reject) => {
                 const resolveResponse = resolveJsonResponseFactory(resolve, reject, 'MyRequest');
-                let dataCallback, endCallback;
+                let dataCallback = (a) => { };
+                let endCallback = (a) => { };
                 response.on = jest.fn((event, cb) => {
                     if (event === 'data') dataCallback = cb;
                     if (event === 'end') endCallback = cb;
@@ -237,4 +223,47 @@ describe('io.js', () => {
             });
         });
     });
+
+    describe('resolveJsonRequestOptions()', () => {
+        it('returns default options', () => {
+            expect(resolveJsonRequestOptions({})).toEqual({
+                port: 443,
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+        })
+        it('merges provided options with default ones', () => {
+            const options = {
+                method: 'POST',
+                host: 'example.com',
+                headers: {
+                    'Accept': 'text/plain',
+                    'Out-of-ideas': 'yes'
+                }
+            }
+            expect(resolveJsonRequestOptions(options)).toEqual({
+                host: 'example.com',
+                port: 443,
+                method: 'POST',
+                headers: {
+                    'Accept': 'text/plain',
+                    'Out-of-ideas': 'yes'
+                }
+            })
+        })
+
+        it('adds headers for posting data if data is passed', () => {
+            expect(resolveJsonRequestOptions({}, 'some data')).toEqual({
+                port: 443,
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Content-Length': 9
+                }
+            })
+        })
+    })
 });

@@ -1,3 +1,4 @@
+// @ts-nocheck
 jest.mock('../src/app.js');
 jest.mock('../src/io.js');
 import { Factory } from '../src/factory.js';
@@ -51,6 +52,7 @@ describe('factory.js', () => {
             conf.coffeeShopsPath = 'coffeeShop/path';
             const factory = new Factory(conf);
             factory.httpFetch = () => 'httpFetchFn';
+            factory.parseCoffeeShops = () => 'parseCoffeeShopsFn';
             App.fetchCoffeeShopsFactory.mockReturnValue('expected');
 
             expect(factory.fetchCoffeeShops()).toBe('expected');
@@ -58,7 +60,8 @@ describe('factory.js', () => {
             expect(App.fetchCoffeeShopsFactory).toHaveBeenCalledWith(
                 'example.com',
                 'coffeeShop/path',
-                'httpFetchFn'
+                'httpFetchFn',
+                'parseCoffeeShopsFn'
             );
             App.fetchCoffeeShopsFactory.mockReset();
         });
@@ -103,6 +106,7 @@ describe('factory.js', () => {
             conf.tokenPath = 'token/path';
             const factory = new Factory(conf);
             factory.resolveJsonResponse = () => 'resolveJsonResponseFn';
+            factory.resolveJsonRequestOptions = () => 'resolveJsonRequestOptionsFn';
             factory.https = () => 'https-module';
             IO.httpFetchFactory.mockReturnValue('expected');
 
@@ -111,6 +115,7 @@ describe('factory.js', () => {
             expect(IO.httpFetchFactory).toHaveBeenCalledWith(
                 'https-module',
                 'resolveJsonResponseFn',
+                'resolveJsonRequestOptionsFn'
             );
             IO.httpFetchFactory.mockReset();
         });

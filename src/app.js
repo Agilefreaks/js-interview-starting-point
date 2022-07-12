@@ -1,64 +1,56 @@
 import { AsyncList } from './asyncList.js';
 import { CoffeeShop } from './coffeeShop.js';
 
-/** @module app */
-
 /**
- * @typedef module:app.Point
- * @type {Object}
+ * @typedef {object} Point
  * @property {number} x
  * @property {number} y
  */
 
 /**
- * @typedef module:app.getNearestShops
- * @type {function}
- * @param {module:app.Point} position
+ * @callback getNearestShops
+ * @param {Point} position
  * @param {number} numberOfShopsToReturn
- *
- * @returns {Promise<Array<{position: module:app.Point, shop: module:coffeeShop.CoffeeShop, distance: number}>>}
+ * @returns {Promise<Array<import('./coffeeShop.js').ShopDistance>>}
  */
 
 /**
- * @param {module:app.fetchShopList} fetchCoffeeShops
- * @param {module:coffeeShop.shopDistanceTo} fetchCoffeeShops
- * @param {module:coffeeShop.distanceAsc} distanceAsc
- *
- * @returns {module:app.getNearestShops}
+ * @param {fetchShopList} fetchShops
+ * @param {import("./coffeeShop.js").shopDistanceTo} shopDistanceTo
+ * @param {import("./coffeeShop").distanceAsc} distanceAsc
+ * @returns {getNearestShops}
  */
-export function nearestShopsFactory(fetchCoffeeShops, shopDistanceTo, distanceAsc) {
-    return (position, numberOfShopsToReturn) => fetchCoffeeShops()
+export function nearestShopsFactory(fetchShops, shopDistanceTo, distanceAsc) {
+    return (position, numberOfShopsToReturn) => fetchShops()
         .map(shopDistanceTo(position))
         .sort(distanceAsc)
         .take(numberOfShopsToReturn);
 }
 
 /**
- * @typedef module:app.fetchShopList
- * @type {function}
- * @returns {module:asyncList.AsyncList}
+ * @callback fetchShopList
+ * @returns {import('./asyncList.js').AsyncList}
  */
 
 /**
- * @param {module:app.fetchCoffeeShopAPIToken} fetchCoffeeShopAPIToken
- * @param {module:app.fetchCoffeeShops} fetchShops
- * @returns {module:app.fetchShopList}
+ * @param {fetchAPIToken} fetchAPIToken
+ * @param {fetchCoffeeShops} fetchShops
+ * @returns {fetchShopList}
  */
-export function fetchShopListFactory(fetchCoffeeShopAPIToken, fetchShops) {
-    return () => new AsyncList(fetchCoffeeShopAPIToken().then(fetchShops));
+export function fetchShopListFactory(fetchAPIToken, fetchShops) {
+    return () => new AsyncList(fetchAPIToken().then(fetchShops));
 }
 
 /**
- * @typedef module:app.fetchCoffeeShopAPIToken
- * @type {function}
+ * @callback fetchAPIToken
  * @returns {Promise<string>}
  */
 
 /**
  * @param {string} host
  * @param {string} path
- * @param {module:IO.httpFetch} httpFetch
- * @return {module:app.fetchCoffeeShopAPIToken}
+ * @param {import("./io.js").httpFetch<{token?: string}>} httpFetch
+ * @return {fetchAPIToken}
  */
 export function fetchCoffeeShopAPITokenFactory(host, path, httpFetch) {
     const ERROR_PREFIX = 'Fetch Token';
@@ -79,19 +71,24 @@ export function fetchCoffeeShopAPITokenFactory(host, path, httpFetch) {
 }
 
 /**
- *
- * @typedef module:app.fetchCoffeeShops
- * @type {function}
+ * @callback fetchCoffeeShops
  * @param {string} token
- * @return {Promise<module:coffeeShop.CoffeeShop[]>}
+ * @return {Promise<import('./coffeeShop.js').CoffeeShop[]>}
+ */
+
+/**
+ * @typedef {object} RawShopData
+ * @property {string} [name]
+ * @property {string} [x]
+ * @property {string} [y]
  */
 
 /**
  * @param {string} host
  * @param {string} path
- * @param {module:IO.httpFetch} httpFetch
- * @param {module:app.parseCoffeeShops} parseData
- * @return {module:app.fetchCoffeeShops}
+ * @param {import('./io.js').httpFetch<Array<RawShopData>>} httpFetch
+ * @param {parseCoffeeShops} parseData
+ * @return {fetchCoffeeShops}
  */
 export function fetchCoffeeShopsFactory(host, path, httpFetch, parseData) {
     const ERROR_PREFIX = 'Fetch coffee-shops';
@@ -106,8 +103,8 @@ export function fetchCoffeeShopsFactory(host, path, httpFetch, parseData) {
 }
 
 /**
- * @param {Array<{name: string, x: number, y: number}>} list
- * @returns {Array<module:coffeeShop.CoffeeShop>|Promise}
+ * @param {Array<RawShopData>} list
+ * @returns {Array<import('./coffeeShop').CoffeeShop>|Promise}
  */
 export function parseCoffeeShops(list) {
     if (!Array.isArray(list)) {
@@ -116,10 +113,12 @@ export function parseCoffeeShops(list) {
     const result = [];
     const success = list.every(item => {
         if (typeof item.name !== 'string') return false;
-        if (typeof item.x !== 'number') return false;
-        if (typeof item.y !== 'number') return false;
+        const x = parseFloat(item.x)
+        const y = parseFloat(item.y)
+        if (Number.isNaN(x)) return false;
+        if (Number.isNaN(y)) return false;
 
-        result.push(new CoffeeShop(item.name, item.x, item.y));
+        result.push(new CoffeeShop(item.name, x, y));
 
         return true;
     });

@@ -1,19 +1,17 @@
-/** @module parseInput */
-
 /**
- * @typedef module:parseInput.ParseInputResult
- * @type {Object}
+ * @typedef {object} ParseInputResult
  * @property {Error|null} error
- * @property {module:app.Point|null} point
+ * @property {import('./app.js').Point|null} point
  */
 
 /**
  * Parses process.argv
  *
  * @param {string[]} args
- * @return {module:parseInput.ParseInputResult}
+ * @returns {ParseInputResult}
  */
 export function parseInput(args) {
+    /** @type {ParseInputResult} */
     const result = {
         error: null,
         point: null

@@ -1,20 +1,11 @@
 /**
- * @module asyncList
+ * @template T , U
  */
-
-/**
- * @typedef module:asyncList.modifier
- * @type {function}
- * @param {Array}
- * @returns {Array}
- */
-
-
 export class AsyncList {
 
     /**
-     * @param {Promise} promise
-     * @param {module:asyncList.modifier} [modifier]
+     * @param {Promise<T>|Promise<Array<T>>} promise
+     * @param {function(Array<T>):Array<U>|Array<T>} [modifier]
      */
     constructor(promise, modifier) {
         this._promise = promise;
@@ -26,21 +17,19 @@ export class AsyncList {
     }
 
     /**
-     * @return {Promise}
+     * @return {Promise<Array<T>>|Promise<Array<T>>}
      */
     run() {
-        if (typeof this._modifier === 'function') {
-            return this._promise.then(data => {
-                if (!Array.isArray(data)) return this._modifier([data]);
-                return this._modifier(data);
-            });
-        }
-        return this._promise;
+        return this._promise.then(data => {
+            if (!Array.isArray(data)) return this._modifier([data]);
+            return this._modifier(data);
+        });
     }
 
     /**
-     * @param {function} fn
-     * @return {AsyncList}
+     * @template V
+     * @param {function(T):V} fn
+     * @return {AsyncList<T, V>}
      */
     map(fn) {
         const modifier = this._modifier;
@@ -48,8 +37,8 @@ export class AsyncList {
     }
 
     /**
-     * @param {function} fn
-     * @return {AsyncList}
+     * @param {function(T, T):number} fn
+     * @return {AsyncList<T, U>}
      */
     sort(fn) {
         const modifier = this._modifier;
@@ -58,7 +47,7 @@ export class AsyncList {
 
     /**
      * @param {number} n
-     * @return {Promise}
+     * @return {Promise<Array<T>>|Promise<Array<U>>}
      */
     take(n) {
         const modifier = this._modifier;

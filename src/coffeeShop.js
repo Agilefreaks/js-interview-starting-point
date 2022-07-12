@@ -1,9 +1,17 @@
 /**
- * @module coffeeShop
+ * @typedef {object} ShopDistance
+ * @property {import('./app.js').Point} point
+ * @property {import('./coffeeShop').CoffeeShop} shop
+ * @property {number} distance
  */
 
 /**
+ * @callback calculateDistance
+ * @param {CoffeeShop} shop
+ * @returns {ShopDistance}
  */
+
+
 export class CoffeeShop {
     /**
      * @constructor
@@ -12,23 +20,22 @@ export class CoffeeShop {
      * @param {number} y
      */
     constructor(name, x, y) {
+
+        /** @property {string} */
         this.name = name;
+
+        /** @property {number} */
         this.x = x;
+
+        /** @property {number} */
         this.y = y;
     }
 }
 
-/**
- * @typedef module:coffeeShop.calculateDistance
- * @type {function}
- * @param {CoffeeShop} shop
- * @return {{position: module:app.Point, shop: module:coffeeShop.CoffeeShop, distance: number}}
- */
 
 /**
- *
- * @param {module:app.Point} point
- * @return {module:coffeeShop.calculateDistance}
+ * @param {import("./app.js").Point} point origin for calculating distance from
+ * @returns {calculateDistance}
  */
 export function shopDistanceTo(point) {
     return (shop) => {
@@ -43,9 +50,9 @@ export function shopDistanceTo(point) {
 }
 
 /**
- * @param {number} a
- * @param {number} b
- * @return {number}
+ * @param {{distance:number}} a
+ * @param {{distance:number}} b
+ * @returns {number}
  */
 export function distanceAsc(a, b) {
     return a.distance - b.distance;
@@ -53,7 +60,7 @@ export function distanceAsc(a, b) {
 
 /**
  * @param {function} printFn
- * @param {{position: module:app.Point, shop: CoffeeShop, distance: number}} list
+ * @param {Array<ShopDistance>} list
  * @returns {void}
  */
 export function printNearestShops(printFn, list) {
