@@ -28,21 +28,21 @@ export class Factory {
      * @returns {App.getNearestShops}
      */
     nearestCoffeeShops() {
-        const fetchShops = this.fetchCoffeeShopList();
-        const shopDistanceTo = this.shopDistanceTo();
-        const distanceAsc = this.distanceAsc();
-
-        return App.nearestShopsFactory(fetchShops, shopDistanceTo, distanceAsc);
+        return App.nearestShopsFactory(
+            this.fetchCoffeeShopList(),
+            CoffeeShop.shopDistanceTo,
+            CoffeeShop.distanceAsc
+        );
     }
 
     /**
      * @returns {App.fetchShopList}
      */
     fetchCoffeeShopList() {
-        const fetchCoffeeShopAPIToken = this.fetchCoffeeShopAPIToken();
-        const fetchCoffeeShops = this.fetchCoffeeShops();
-
-        return App.fetchShopListFactory(fetchCoffeeShopAPIToken, fetchCoffeeShops);
+        return App.fetchShopListFactory(
+            this.fetchCoffeeShopAPIToken(),
+            this.fetchCoffeeShops()
+        );
     }
 
     /**
@@ -51,20 +51,7 @@ export class Factory {
     fetchCoffeeShops() {
         const { host, coffeeShopsPath } = this.config;
         const httpFetch = this.httpFetch();
-        const parseCoffeeShops = this.parseCoffeeShops()
-        return App.fetchCoffeeShopsFactory(host, coffeeShopsPath, httpFetch, parseCoffeeShops);
-    }
-
-    parseCoffeeShops() {
-        return App.parseCoffeeShops
-    }
-
-    shopDistanceTo() {
-        return CoffeeShop.shopDistanceTo;
-    }
-
-    distanceAsc() {
-        return CoffeeShop.distanceAsc;
+        return App.fetchCoffeeShopsFactory(host, coffeeShopsPath, httpFetch, App.parseCoffeeShops);
     }
 
     /**
@@ -81,21 +68,10 @@ export class Factory {
      * @returns {IO.httpFetch<T>}
      */
     httpFetch() {
-        const resolveRequestOptions = this.resolveJsonRequestOptions()
-        const resolveResponse = this.resolveJsonResponse()
-        return IO.httpFetchFactory(this.https(), resolveResponse, resolveRequestOptions);
+        return IO.httpFetchFactory(
+            https,
+            IO.resolveJsonResponseFactory,
+            IO.resolveJsonRequestOptions
+        );
     }
-
-    resolveJsonRequestOptions() {
-        return IO.resolveJsonRequestOptions;
-    }
-
-    https() {
-        return https;
-    }
-
-    resolveJsonResponse() {
-        return IO.resolveJsonResponseFactory;
-    }
-
 }

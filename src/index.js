@@ -10,7 +10,7 @@ const SHOPS_LIMIT = 3;
 
 const input = parseInput(process.argv);
 
-if (input.error !== null) {
+if (input.error) {
     console.error(input.error);
     process.exit(1);
 }

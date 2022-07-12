@@ -1,6 +1,7 @@
 // @ts-nocheck
 jest.mock('../src/app.js');
 jest.mock('../src/io.js');
+import https from 'https';
 import { Factory } from '../src/factory.js';
 import * as App from '../src/app.js';
 import * as IO from '../src/io.js';
@@ -13,36 +14,49 @@ describe('factory.js', () => {
     describe('nearestCoffeeShops()', () => {
         it('calls and returns app.nearestShopsFactory() providing all dependencies', () => {
             const factory = new Factory(conf);
-            factory.fetchCoffeeShopList = () => 'fetchCoffeeShopListFn';
-            factory.shopDistanceTo = () => 'shopDistanceToFn';
-            factory.distanceAsc = () => 'distanceAscFn';
+
+            const fakeFetchCoffeeShopList = () => { };
+            const fetchCoffeeShopListSpy = jest.spyOn(factory, 'fetchCoffeeShopList')
+                .mockReturnValue(fakeFetchCoffeeShopList);
+
             App.nearestShopsFactory.mockReturnValue('expected');
 
             expect(factory.nearestCoffeeShops()).toBe('expected');
-            expect(App.nearestShopsFactory).toHaveBeenCalledTimes(1);
             expect(App.nearestShopsFactory).toHaveBeenCalledWith(
-                'fetchCoffeeShopListFn',
-                'shopDistanceToFn',
-                'distanceAscFn'
+                fakeFetchCoffeeShopList,
+                shopDistanceTo,
+                distanceAsc
             );
+
             App.nearestShopsFactory.mockReset();
+            fetchCoffeeShopListSpy.mockRestore();
         });
     });
 
     describe('fetchCoffeeShopList()', () => {
         it('calls and returns app.fetchShopListFactory() providing all dependencies', () => {
             const factory = new Factory(conf);
-            factory.fetchCoffeeShopAPIToken = () => 'fetchCoffeeShopAPITokenFn';
-            factory.fetchCoffeeShops = () => 'fetchCoffeeShopsFn';
+
+            const fakeFetchCoffeeShopAPIToken = () => { };
+            const fetchCoffeeShopAPITokenSpy = jest.spyOn(factory, 'fetchCoffeeShopAPIToken')
+                .mockReturnValue(fakeFetchCoffeeShopAPIToken);
+
+            const fakeFetchCoffeeShops = () => { };
+            const fetchCoffeeShopsSpy = jest.spyOn(factory, 'fetchCoffeeShops')
+                .mockReturnValue(fakeFetchCoffeeShops);
+
             App.fetchShopListFactory.mockReturnValue('expected');
 
+
             expect(factory.fetchCoffeeShopList()).toBe('expected');
-            expect(App.fetchShopListFactory).toHaveBeenCalledTimes(1);
             expect(App.fetchShopListFactory).toHaveBeenCalledWith(
-                'fetchCoffeeShopAPITokenFn',
-                'fetchCoffeeShopsFn'
+                fakeFetchCoffeeShopAPIToken,
+                fakeFetchCoffeeShops
             );
+
             App.fetchShopListFactory.mockReset();
+            fetchCoffeeShopAPITokenSpy.mockRestore();
+            fetchCoffeeShopsSpy.mockRestore();
         });
     });
 
@@ -51,33 +65,23 @@ describe('factory.js', () => {
             conf.host = 'example.com';
             conf.coffeeShopsPath = 'coffeeShop/path';
             const factory = new Factory(conf);
-            factory.httpFetch = () => 'httpFetchFn';
-            factory.parseCoffeeShops = () => 'parseCoffeeShopsFn';
+
+            const fakeHttpFetch = () => { };
+            const httpFetchSpy = jest.spyOn(factory, 'httpFetch')
+                .mockReturnValue(fakeHttpFetch);
+
             App.fetchCoffeeShopsFactory.mockReturnValue('expected');
 
             expect(factory.fetchCoffeeShops()).toBe('expected');
-            expect(App.fetchCoffeeShopsFactory).toHaveBeenCalledTimes(1);
             expect(App.fetchCoffeeShopsFactory).toHaveBeenCalledWith(
                 'example.com',
                 'coffeeShop/path',
-                'httpFetchFn',
-                'parseCoffeeShopsFn'
+                fakeHttpFetch,
+                App.parseCoffeeShops
             );
+
             App.fetchCoffeeShopsFactory.mockReset();
-        });
-    });
-
-    describe('shopDistanceTo()', () => {
-        it('returns CoffeeShop.shopDistanceTo()', () => {
-            const factory = new Factory(conf);
-            expect(factory.shopDistanceTo()).toBe(shopDistanceTo);
-        });
-    });
-
-    describe('distanceAsc()', () => {
-        it('returns CoffeeShop.distanceAsc()', () => {
-            const factory = new Factory(conf);
-            expect(factory.distanceAsc()).toBe(distanceAsc);
+            httpFetchSpy.mockRestore();
         });
     });
 
@@ -86,17 +90,22 @@ describe('factory.js', () => {
             conf.host = 'example.com';
             conf.tokenPath = 'token/path';
             const factory = new Factory(conf);
-            factory.httpFetch = () => 'httpFetchFn';
+
+            const fakeHttpFetch = () => { };
+            const httpFetchSpy = jest.spyOn(factory, 'httpFetch')
+                .mockReturnValue(fakeHttpFetch);
+
             App.fetchCoffeeShopAPITokenFactory.mockReturnValue('expected');
 
             expect(factory.fetchCoffeeShopAPIToken()).toBe('expected');
-            expect(App.fetchCoffeeShopAPITokenFactory).toHaveBeenCalledTimes(1);
             expect(App.fetchCoffeeShopAPITokenFactory).toHaveBeenCalledWith(
                 'example.com',
                 'token/path',
-                'httpFetchFn'
+                fakeHttpFetch
             );
+
             App.fetchCoffeeShopAPITokenFactory.mockReset();
+            httpFetchSpy.mockRestore();
         });
     });
 
@@ -105,27 +114,17 @@ describe('factory.js', () => {
             conf.host = 'example.com';
             conf.tokenPath = 'token/path';
             const factory = new Factory(conf);
-            factory.resolveJsonResponse = () => 'resolveJsonResponseFn';
-            factory.resolveJsonRequestOptions = () => 'resolveJsonRequestOptionsFn';
-            factory.https = () => 'https-module';
+
             IO.httpFetchFactory.mockReturnValue('expected');
 
             expect(factory.httpFetch()).toBe('expected');
-            expect(IO.httpFetchFactory).toHaveBeenCalledTimes(1);
             expect(IO.httpFetchFactory).toHaveBeenCalledWith(
-                'https-module',
-                'resolveJsonResponseFn',
-                'resolveJsonRequestOptionsFn'
+                https,
+                IO.resolveJsonResponseFactory,
+                IO.resolveJsonRequestOptions
             );
+
             IO.httpFetchFactory.mockReset();
         });
     });
-
-    describe('resolveJsonResponse()', () => {
-        it('returns IO.resolveJsonResponseFactory()', () => {
-            const factory = new Factory(conf);
-            expect(factory.resolveJsonResponse()).toBe(IO.resolveJsonResponseFactory);
-        });
-    });
-
 });

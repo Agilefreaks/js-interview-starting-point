@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { shopDistanceTo, printNearestShops } from '../src/coffeeShop.js';
 
 describe('coffeeShop.js', () => {
