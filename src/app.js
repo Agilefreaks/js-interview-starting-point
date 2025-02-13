@@ -7,9 +7,10 @@ import { fetchCoffeeShops } from './api.js';
  * 
  * @returns {Array<position>}
  */
-export function getNearestShops(position) {
+export async function getNearestShops(position) {
   const distanceToShop = calculateDistance(0, 0, position.x, position.y);
   console.log(distanceToShop);
-  fetchCoffeeShops();
+  const coffeeShops = await fetchCoffeeShops();
+  console.log(distanceToShop, coffeeShops);
   return [];
 }
