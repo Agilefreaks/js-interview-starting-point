@@ -1,3 +1,4 @@
+import { calculateDistance } from './utils.js';
 /**
  * @param {Object} position
  * @param {Number} position.x
@@ -6,7 +7,8 @@
  * @returns {Array<position>}
  */
 export function getNearestShops(position) {
-  // code
+  // const distanceToShop = calculateDistance(0, 0, position.x, position.y);
+  // console.log(distanceToShop);
   
   return [];
 }
