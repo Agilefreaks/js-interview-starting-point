@@ -1,3 +1,4 @@
+//test for getting the nearest shops
 import { getNearestShops } from '../src/app';
 
 describe('App', () => {
