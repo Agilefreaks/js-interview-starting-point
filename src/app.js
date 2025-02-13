@@ -8,8 +8,8 @@ import { fetchCoffeeShops } from './api.js';
  * @returns {Array<position>}
  */
 export function getNearestShops(position) {
-  // const distanceToShop = calculateDistance(0, 0, position.x, position.y);
-  // console.log(distanceToShop);
+  const distanceToShop = calculateDistance(0, 0, position.x, position.y);
+  console.log(distanceToShop);
   fetchCoffeeShops();
   return [];
 }
