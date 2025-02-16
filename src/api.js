@@ -5,30 +5,44 @@ const MAX_RETRIES = 3;
 // Base delay time (ms) before retrying failed requests
 const RETRY_DELAY = 1000;
 
+// Error handler
+function apiErrorHandler(status) {
+  const errorMessages = {
+    401: 'Unauthorized.',
+    406: 'Unacceptable Accept format.',
+    503: 'Service unavailable.',
+    504: 'Timeout.',
+  };
+
+  throw new Error(`API request failed. Status: ${errorMessages[status]}`);
+}
+
 // Utility function to handle fetch requests with error handling and retries
 const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await fetch(url, options);
-      
-      if (!response.ok) { 
-        const status = response.status;
-        const shouldRetry = [401, 503, 504].includes(status); // Only retry on these errors
-        
+
+      if (!response && !response.ok) { 
+        const status = response.status || 'Unknown';
+        // Only retry on these errors
+        const shouldRetry = [401, 503, 504].includes(status); 
+
         if (shouldRetry && attempt < retries) {
-          const delay = RETRY_DELAY * attempt; // Exponential backoff
+          // Exponential backoff
+          const delay = RETRY_DELAY * attempt;
           console.warn(`Attempt ${attempt} failed: ${status}. Retrying in ${delay} ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue; 
         }
-  
-        throw new Error(`Failed to fetch: ${status} ${response.statusText}`);
+        apiErrorHandler(status);
       }
       return await response.json();
     } catch (error) {
       console.error(`Attempt ${attempt} failed: ${error.message}`);
       if (attempt === retries) {
-        throw new Error(`Request failed after ${retries} retries: ${error.message}`);
+        const errorMessage = error?.message || 'Unknown error occurred';
+        throw new Error(`Request failed after ${retries} retries: ${errorMessage}`);
       }
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt)); 
     }
