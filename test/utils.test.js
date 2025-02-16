@@ -19,5 +19,17 @@ describe('calculateDistance', () => {
       const result = calculateDistance(x1, y1, x2, y2);
       expect(result).toBe(14.1421);
     });
+
+    it('should handle floating point values and return correct distance', () => {
+      const x1 = 1.1, y1 = 2.2, x2 = 3.3, y2 = 4.4;
+      const result = calculateDistance(x1, y1, x2, y2);
+      expect(result).toBeCloseTo(3.1113, 4);
+    });
+
+    it('should handle large values correctly', () => {
+      const x1 = 1000000, y1 = 1000000, x2 = 2000000, y2 = 2000000;
+      const result = calculateDistance(x1, y1, x2, y2);
+      expect(result).toBe(1414213.5624); 
+    });
 });
   
