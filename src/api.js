@@ -29,8 +29,14 @@ const errorMessages = {
 // Utility function to handle fetch requests with error handling and retries
 const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
+    // Create an AbortController to manage the timeout for fetch
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1000);
+
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, { ...options, signal: controller.signal });
+      // Clean up the timeout once the fetch is successful
+      clearTimeout(timeoutId);  
 
       if (!response.ok) { 
         const status = response.status || 'Unknown';
@@ -48,10 +54,10 @@ const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
       }
       return await response.json();
     } catch (error) {
-      console.error(`Attempt ${attempt} failed: ${error.message}`);
+      clearTimeout(timeoutId);
+      console.error(`Attempt ${attempt} failed: ${error.message}. ${error.name === 'AbortError' ? 'Request was aborted due to timeout.' : ''}`);
       if (attempt === retries) {
-        const errorMessage = error?.message || 'Unknown error occurred';
-        throw new Error(`Request failed after ${retries} retries: ${errorMessage}`);
+        throw new Error(`Request failed after ${retries} retries.`);
       }
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt)); 
     }
