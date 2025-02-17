@@ -1,4 +1,13 @@
-//test the result of distance calculation
+/**
+ * Unit tests for `calculateDistance` function.
+ *
+ * Tests include:
+ * - Verifying distance calculation between two points.
+ * - Ensuring function correctly handles identical points.
+ * - Handling negative coordinates and large values.
+ * - Ensuring accuracy when dealing with floating-point numbers.
+ */
+
 import { calculateDistance } from '../src/utils.js';
 
 describe('calculateDistance', () => {

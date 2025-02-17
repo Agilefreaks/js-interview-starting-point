@@ -1,4 +1,13 @@
-// test fetch of coffee shops
+/**
+ * Unit tests for API functions:`fetchCoffeeShops` and `getToken`.
+ *
+ * Tests include:
+ * - Ensuring the token retrieval function fetches and returns a valid token.
+ * - Handling API failures and ensuring errors are properly thrown.
+ * - Fetching coffee shop data correctly using a retrieved token.
+ */
+
+
 import { fetchCoffeeShops, getToken } from '../src/api.js';
 
 // Mock fetch globally

@@ -1,3 +1,11 @@
+/**
+ * Unit tests for `getNearestShops` & 'getPositionFromCLI functions.
+ * Tests include:
+ * - Validating correct or incorrect user input.
+ * - Ensuring API failures are handled properly.
+ * - Verifying the function correctly sorts and returns the nearest 3 shops.
+ */
+
 import { getNearestShops, getPositionFromCLI } from '../src/app.js';
 import { fetchCoffeeShops } from '../src/api.js';
 

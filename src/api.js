@@ -1,3 +1,17 @@
+/**
+ * API interaction module for fetching coffee shop data.
+ *
+ * Functions:
+ * - `getToken`: Retrieves an authentication token from the API.
+ * - `fetchCoffeeShops`: Fetches the list of coffee shops using the retrieved token.
+ *
+ * Features:
+ * - Implements retry logic for failed requests.
+ * - Uses exponential backoff for handling API failures.
+ * - Ensures proper error handling and logging.
+ */
+
+
 const URL = "https://api-challenge.agilefreaks.com/v1";
 
 // Maximum number of retry attempts for failed requests
@@ -5,17 +19,12 @@ const MAX_RETRIES = 3;
 // Base delay time (ms) before retrying failed requests
 const RETRY_DELAY = 1000;
 
-// Error handler
-function apiErrorHandler(status) {
-  const errorMessages = {
-    401: 'Unauthorized.',
-    406: 'Unacceptable Accept format.',
-    503: 'Service unavailable.',
-    504: 'Timeout.',
-  };
-
-  throw new Error(`API request failed. Status: ${errorMessages[status]}`);
-}
+const errorMessages = {
+  401: 'Unauthorized.',
+  406: 'Unacceptable Accept format.',
+  503: 'Service unavailable.',
+  504: 'Timeout.',
+};
 
 // Utility function to handle fetch requests with error handling and retries
 const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
@@ -23,7 +32,7 @@ const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
     try {
       const response = await fetch(url, options);
 
-      if (!response && !response.ok) { 
+      if (!response.ok) { 
         const status = response.status || 'Unknown';
         // Only retry on these errors
         const shouldRetry = [401, 503, 504].includes(status); 
@@ -31,11 +40,11 @@ const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
         if (shouldRetry && attempt < retries) {
           // Exponential backoff
           const delay = RETRY_DELAY * attempt;
-          console.warn(`Attempt ${attempt} failed: ${status}. Retrying in ${delay} ms...`);
+          console.warn(`Attempt ${attempt} failed: ${errorMessages[status] || status} Retrying in ${delay} ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
           continue; 
         }
-        apiErrorHandler(status);
+        throw new Error(`API request failed. ${errorMessages[status] || status}`);
       }
       return await response.json();
     } catch (error) {

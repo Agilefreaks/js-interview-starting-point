@@ -1,3 +1,16 @@
+/**
+ * Main application logic for finding the nearest coffee shops.
+ *
+ * Functions:
+ * - `getNearestShops`: Retrieves and sorts coffee shops based on a given location.
+ *
+ * Features:
+ * - Fetches coffee shop data from the API.
+ * - Computes distances and returns the closest shops.
+ * - Handles edge cases like no available shops.
+ */
+
+
 import { calculateDistance } from "./utils.js";
 import { fetchCoffeeShops } from "./api.js";
 

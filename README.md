@@ -1,26 +1,10 @@
-# Javascript Interview Starting Point
+# Coffee Shop Finder
 
-This repo will serve as a starting point for your code challenge. Feel free to change anything in order to complete it: Add modules, other tests, new packages etc.
+This project finds the **3 nearest coffee shops** based on a user's coordinates.
 
-## Steps
 
-- Fork this repo
-- Clone your fork
-- Finish the exercise
-- Push your best work
-
-## Commands
-
-```
-yarn run start  # Run the main script
-         dev    # Start development mode 
-         test   # Test the code
-````
-## Tools
-
-- Write modern JS with [babel/preset-env](https://www.npmjs.com/package/@babel/preset-env)
-- Test your code with [jest](https://www.npmjs.com/package/jest)
-
----
-
-Good luck!
+## Features
+- Fetches coffee shop data from an API  
+- Calculates distance using a `calculateDistance` utility  
+- Sorts and displays the **top 3 nearest** shops  
+- Handles invalid user input & API failures 
