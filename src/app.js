@@ -11,7 +11,8 @@
  */
 
 
-import { calculateDistance } from "./utils.js";
+import { calculateDistance } from "./utils/calculateDistance.js";
+import { validateCoordinates } from "./utils/validateCoordinates.js";
 import { fetchCoffeeShops } from "./api.js";
 
 /**
@@ -23,15 +24,15 @@ import { fetchCoffeeShops } from "./api.js";
  */
 
 export function getPositionFromCLI() {
-  // Ensure the input is valid before passing to getNearestShops
-  const x = parseFloat(process.argv[2]);
-  const y = parseFloat(process.argv[3]);
-
-  if (isNaN(x) || isNaN(y)) {
-    throw new Error('Invalid coordinates. Please provide valid numbers!');
+  let position;
+  let error = 'Please provide valid numbers!';
+  try {
+    position = validateCoordinates(process.argv[2], process.argv[3], error);
+  } catch (error) {
+    console.error(error.message);
+    throw error;
   }
-
-  return { x, y };
+  return position;
 }
 
 export async function getNearestShops() {
@@ -41,8 +42,7 @@ export async function getNearestShops() {
   try {
     position = getPositionFromCLI();
   } catch (error) {
-    console.error(error.message);
-    process.exit(1);
+    return;
   }
 
   let coffeeShops = [];
@@ -61,7 +61,7 @@ export async function getNearestShops() {
     .map(shop => ({
       id: shop.id, 
       name: shop.name, 
-      distance: calculateDistance(position.x, position.y, parseFloat(shop.x), parseFloat(shop.y))
+      distance: calculateDistance(position.x, position.y, shop.x, shop.y)
     }))
     .sort((a, b) => a.distance - b.distance)
     .slice(0, 3);
