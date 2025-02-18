@@ -8,9 +8,11 @@
  * - Ensuring accuracy when dealing with floating-point numbers.
  */
 
-import { calculateDistance } from '../src/utils.js';
+import { calculateDistance } from '../src/utils/calculateDistance.js';
+import { validateCoordinates } from '../src/utils/validateCoordinates.js';
 
-describe('calculateDistance', () => {
+describe('Utility functions', () => {
+  describe('calculateDistance', () => {
     it('should calculate the correct distance between two points', () => {
       const x1 = 0, y1 = 0, x2 = 3, y2 = 4;
       const result = calculateDistance(x1, y1, x2, y2);
@@ -40,5 +42,37 @@ describe('calculateDistance', () => {
       const result = calculateDistance(x1, y1, x2, y2);
       expect(result).toBeCloseTo(1414213.5624); 
     });
+  });
+
+  describe('validateCoordinates', () => {
+    it('should return valid coordinates when given valid numbers', () => {
+      const result = validateCoordinates(1, 2, 'Invalid coordinates.');
+      expect(result).toEqual({ x: 1, y: 2 });
+    });
+
+    it('should throw an error for invalid x coordinate', () => {
+      expect(() => {
+        validateCoordinates('abc', 2, 'Invalid coordinates.');
+      }).toThrowError();
+    });
+
+    it('should throw an error for invalid y coordinate', () => {
+      expect(() => {
+        validateCoordinates(1, 'xyz', 'Invalid coordinates.');
+      }).toThrowError();
+    });
+
+    it('should throw an error for invalid x and y coordinates', () => {
+      expect(() => {
+        validateCoordinates('xyz', 'abc', 'Invalid coordinates.');
+      }).toThrowError();
+    });
+
+    it('should throw an error for missing coordinates', () => {
+      expect(() => {
+        validateCoordinates(null, null, 'Invalid coordinates.');
+      }).toThrowError();
+    });
+  });
 });
   
