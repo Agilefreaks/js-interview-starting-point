@@ -7,24 +7,16 @@
  *
  * Features:
  * - Implements retry logic for failed requests.
- * - Uses exponential backoff for handling API failures.
+ * - Uses linear backoff for handling API failures.
  * - Ensures proper error handling and logging.
  */
 
-
-const URL = "https://api-challenge.agilefreaks.com/v1";
+import { HTTP_STATUS, errorMessages, URL } from './constants.js';
 
 // Maximum number of retry attempts for failed requests
 const MAX_RETRIES = 3;
 // Base delay time (ms) before retrying failed requests
 const RETRY_DELAY = 1000;
-
-const errorMessages = {
-  401: 'Unauthorized.',
-  406: 'Unacceptable Accept format.',
-  503: 'Service unavailable.',
-  504: 'Timeout.',
-};
 
 // Utility function to handle fetch requests with error handling and retries
 const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
@@ -40,11 +32,17 @@ const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
 
       if (!response.ok) { 
         const status = response.status || 'Unknown';
+        if (status === HTTP_STATUS.UNAUTHORIZED) {
+          throw new Error(errorMessages[status]);
+        }
         // Only retry on these errors
-        const shouldRetry = [401, 503, 504].includes(status); 
+        const shouldRetry = [          
+          HTTP_STATUS.SERVICE_UNAVAILABLE, 
+          HTTP_STATUS.GATEWAY_TIMEOUT,
+        ].includes(status); 
 
         if (shouldRetry && attempt < retries) {
-          // Exponential backoff
+          // Linear backoff
           const delay = RETRY_DELAY * attempt;
           console.warn(`Attempt ${attempt} failed: ${errorMessages[status] || status} Retrying in ${delay} ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -55,6 +53,9 @@ const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
+      if (error.message === errorMessages[HTTP_STATUS.UNAUTHORIZED]) {
+        throw error;
+      }
       console.error(`Attempt ${attempt} failed: ${error.message}. ${error.name === 'AbortError' ? 'Request was aborted due to timeout.' : ''}`);
       if (attempt === retries) {
         throw new Error(`Request failed after ${retries} retries.`);
