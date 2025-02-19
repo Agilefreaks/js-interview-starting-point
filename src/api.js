@@ -18,8 +18,10 @@ const MAX_RETRIES = 3;
 // Base delay time (ms) before retrying failed requests
 const RETRY_DELAY = 1000;
 
+let currentToken = null;
+
 // Utility function to handle fetch requests with error handling and retries
-const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
+const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES, tokenRefreshed = false) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     // Create an AbortController to manage the timeout for fetch
     const controller = new AbortController();
@@ -28,14 +30,17 @@ const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
     try {
       const response = await fetch(url, { ...options, signal: controller.signal });
       // Clean up the timeout once the fetch is successful
-      clearTimeout(timeoutId);  
+      clearTimeout(timeoutId);
 
-      if (!response.ok) { 
+      if (!response.ok) {
         const status = response.status || 'Unknown';
-        if (status === HTTP_STATUS.UNAUTHORIZED) {
-          throw new Error(errorMessages[status]);
+        if (status === HTTP_STATUS.UNAUTHORIZED && !tokenRefreshed) {
+          console.warn(`Invalid or expired token. Trying with a new token...`);
+          await getToken();
+          const newCoffeeShopsUrl = `${URL}/coffee_shops?token=${currentToken}`;
+          return await fetchWithErrorHandling(newCoffeeShopsUrl, options, retries, true);
         }
-        // Only retry on these errors
+
         const shouldRetry = [          
           HTTP_STATUS.SERVICE_UNAVAILABLE, 
           HTTP_STATUS.GATEWAY_TIMEOUT,
@@ -53,7 +58,7 @@ const fetchWithErrorHandling = async (url, options, retries = MAX_RETRIES) => {
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
-      if (error.message === errorMessages[HTTP_STATUS.UNAUTHORIZED]) {
+      if (error.message.includes(errorMessages[HTTP_STATUS.UNAUTHORIZED])) {
         throw error;
       }
       console.error(`Attempt ${attempt} failed: ${error.message}. ${error.name === 'AbortError' ? 'Request was aborted due to timeout.' : ''}`);
@@ -76,18 +81,39 @@ export async function getToken() {
     },
   };
 
-  // Using fetchWithErrorHandling for error management
-  const tokenResponse = await fetchWithErrorHandling(tokenUrl, options);
-  return tokenResponse;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const response = await fetch(tokenUrl, options);
+      if (!response.ok) {
+        const status = response.status || 'Unknown';
+        if (attempt < MAX_RETRIES) {
+          const delay = RETRY_DELAY * attempt;
+          console.warn(`Attempt ${attempt} failed: ${errorMessages[status] || status}. Retrying in ${delay} ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        throw new Error(`API request failed. ${errorMessages[status] || status}`);
+      }
+      const tokenObj = await response.json();
+      currentToken = tokenObj.token;
+      return tokenObj;
+    } catch (error) {
+      console.error(`Attempt ${attempt} failed: ${error.message}.`);
+      if (attempt === MAX_RETRIES) {
+        throw new Error(`Request failed after ${MAX_RETRIES} retries.`);
+      }
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * attempt));
+    }
+  }
 }
 
 // Function to fetch coffee shops using an API token
 export async function fetchCoffeeShops() {
-  // Fetch token before making the coffee shops request
-  const tokenObj = await getToken();
-  const token = tokenObj.token;  // Destructure the token
+  if (!currentToken) {
+    await getToken();
+  }
 
-  const coffeeShopsUrl = `${URL}/coffee_shops?token=${token}`;
+  const coffeeShopsUrl = `${URL}/coffee_shops?token=${currentToken}`;
   const options = {
     method: 'GET',
     headers: {
