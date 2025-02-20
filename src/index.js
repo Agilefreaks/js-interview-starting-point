@@ -11,10 +11,12 @@ async function main() {
 
   const nearestShops = await getNearestShops({ x: userX, y: userY });
 
-  if (nearestShops) {
+  if (nearestShops && nearestShops.length > 0) {
     nearestShops.forEach((shop) => {
       console.log(`${shop.name}, ${shop.distance}`);
     });
+  } else {
+    console.log("No coffee shops found near you.");
   }
 }
 

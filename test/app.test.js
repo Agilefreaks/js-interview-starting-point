@@ -32,11 +32,11 @@ describe("getNearestShops", () => {
       .mockResolvedValueOnce({
         json: () => Promise.resolve({ token: "test_token" }),
         ok: true,
-      }) //Mock token
+      })
       .mockResolvedValueOnce({
         json: () => Promise.resolve(mockShopsData),
         ok: true,
-      }); //Mock shops data
+      });
     const shops = await getNearestShops({ x: 0, y: 0 });
     expect(shops.length).toBe(3);
   });
@@ -48,11 +48,11 @@ describe("getNearestShops", () => {
       .mockResolvedValueOnce({
         json: () => Promise.resolve({ token: "test_token" }),
         ok: true,
-      }) //Mock token
+      })
       .mockResolvedValueOnce({
         json: () => Promise.resolve(mockShopsData),
         ok: true,
-      }); //Mock shops data
+      });
     const shops = await getNearestShops({ x: 0, y: 0 });
     expect(shops).toBeUndefined();
   });
@@ -70,11 +70,11 @@ describe("getNearestShops", () => {
       .mockResolvedValueOnce({
         json: () => Promise.resolve({ token: "test_token" }),
         ok: true,
-      }) //Mock token
+      })
       .mockResolvedValueOnce({
         json: () => Promise.resolve(mockShopsData),
         ok: true,
-      }); //Mock shops data
+      });
     const shops = await getNearestShops({ x: -50, y: -120 });
     expect(shops.length).toBe(3);
   });
@@ -92,11 +92,11 @@ describe("getNearestShops", () => {
       .mockResolvedValueOnce({
         json: () => Promise.resolve({ token: "test_token" }),
         ok: true,
-      }) //Mock token
+      })
       .mockResolvedValueOnce({
         json: () => Promise.resolve(mockShopsData),
         ok: true,
-      }); //Mock shops data
+      });
     const shops = await getNearestShops({ x: 100000, y: 200000 });
     expect(shops.length).toBe(3);
   });
