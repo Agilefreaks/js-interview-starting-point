@@ -1,4 +1,5 @@
 import { getCoffeeShops } from './api.js';
+import { validatePosition } from './utils.js';
 
 /**
  * @param {Object} position
@@ -8,7 +9,9 @@ import { getCoffeeShops } from './api.js';
  * @returns {Array<position>}
  */
 export async function getNearestShops(position) {
+    validatePosition(position);
+
     const coffeeShops = await getCoffeeShops();
-    console.log(coffeeShops);
+
     return [];
 }

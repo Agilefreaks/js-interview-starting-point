@@ -84,7 +84,7 @@ export async function getToken() {
 
             if (retries >= MAX_RETRIES) {
                 console.error(
-                    `Failed to get coffee shops after ${MAX_RETRIES} attempts: ${err.message}`,
+                    `Failed to get authentication token after ${MAX_RETRIES} attempts: ${err.message}`,
                 );
                 process.exit(1);
             }
