@@ -5,8 +5,11 @@ export function calculateDistance(point1, point2) {
 }
 
 export function validatePosition({ x, y }) {
+    x = Number(x);
+    x = Number(y);
+
     if (isNaN(x) || isNaN(y)) {
-        console.error(
+        throw new Error(
             'Invalid arguments, please add valid numbers as coordinates.',
         );
     }
