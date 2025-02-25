@@ -6,7 +6,7 @@ export function calculateDistance(point1, point2) {
 
 export function validatePosition({ x, y }) {
     x = Number(x);
-    x = Number(y);
+    y = Number(y);
 
     if (isNaN(x) || isNaN(y)) {
         throw new Error(
