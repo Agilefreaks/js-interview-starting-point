@@ -36,7 +36,8 @@ export async function getNearestShops(position) {
         });
     } catch (error) {
         console.error(error.message);
+        return;
     }
 
-    return [];
+    return;
 }

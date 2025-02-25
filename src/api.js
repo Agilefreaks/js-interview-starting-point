@@ -20,7 +20,7 @@ export async function getCoffeeShops() {
                 token = tokenResult.token;
                 console.log('[AUTH] Token obtained');
             }
-
+            console.log('[SHOPS] Fetching for shops.');
             return await fetchWithRetry(
                 `${API_URL}/v1/coffee_shops`,
                 { method: 'GET' },
@@ -88,6 +88,8 @@ async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
                 : url;
 
             const response = await fetch(urlWithToken, {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
                 ...options,
                 signal: controller.signal,
             });
