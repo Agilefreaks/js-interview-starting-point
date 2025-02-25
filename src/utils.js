@@ -16,6 +16,6 @@ export function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function findClosestThree(arr) {
-    return [...arr].sort((a, b) => a - b).slice(0, 3);
+export function getLowestThreeIndices(arr) {
+    return arr.sort((a, b) => a.distance - b.distance).slice(0, 3);
 }
