@@ -5,14 +5,16 @@ export function calculateDistance(point1, point2) {
 }
 
 export function validatePosition({ x, y }) {
-    x = Number(x);
-    y = Number(y);
+    const numX = Number(x);
+    const numY = Number(y);
 
-    if (isNaN(x) || isNaN(y)) {
+    if (isNaN(numX) || isNaN(numY)) {
         throw new Error(
             'Invalid arguments, please add valid numbers as coordinates.',
         );
     }
+
+    return { x: numX, y: numY };
 }
 
 export function sleep(ms) {

@@ -14,30 +14,34 @@ import {
  */
 export async function getNearestShops(position) {
     try {
-        validatePosition(position);
+        const validatedPosition = validatePosition(position);
         const coffeeShops = await getCoffeeShops();
-        const distances = [];
 
         if (!Array.isArray(coffeeShops)) {
             throw new Error('Invalid data returned by API.');
         }
-        coffeeShops.forEach((shop, i) => {
+
+        const distances = coffeeShops.map(shop => {
             const distance = calculateDistance(
                 { x: shop.x, y: shop.y },
-                { x: position.x, y: position.y },
+                validatedPosition,
             );
-            distances.push({ name: shop.name, distance: distance });
+
+            return {
+                name: shop.name,
+                distance: distance,
+            };
         });
 
         const closestThreeShops = getLowestThreeIndices(distances);
 
-        closestThreeShops.map(shop => {
-            console.log(`${shop.name}, ${shop.distance}`);
+        closestThreeShops.forEach(shop => {
+            console.log(`${shop.name}, ${shop.distance.toFixed(4)}`);
         });
+
+        return closestThreeShops;
     } catch (error) {
         console.error(error.message);
-        return;
+        return [];
     }
-
-    return;
 }

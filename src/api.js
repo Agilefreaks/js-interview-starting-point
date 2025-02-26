@@ -103,6 +103,7 @@ async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
 
             if (response.status === 503 || response.status === 504) {
                 retries++;
+
                 const delay = retries * RETRY_DELAY;
                 console.log(
                     `${logPrefix} API error: ${response.status}. Retrying in ${delay}ms (${retries}/${MAX_RETRIES})`,
@@ -139,4 +140,7 @@ async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
             await sleep(delay);
         }
     }
+    throw new Error(
+        `${logPrefix} Failed after ${MAX_RETRIES} attempts: Maximum retries reached`,
+    );
 }
