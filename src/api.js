@@ -13,39 +13,23 @@ export async function getCoffeeShops() {
     let token;
     let retries = 0;
 
-    while (retries < MAX_RETRIES) {
-        try {
-            if (!token) {
-                const tokenResult = await getToken();
-                token = tokenResult.token;
-                console.log('[AUTH] Token obtained');
-            }
-            console.log('[SHOPS] Fetching for shops.');
-            return await fetchWithRetry(
-                `${API_URL}/v1/coffee_shops`,
-                { method: 'GET' },
-                token,
-                '[SHOPS]',
-            );
-        } catch (err) {
-            if (err.needsNewToken) {
-                token = null;
-                continue;
-            }
-
-            retries++;
-            if (retries >= MAX_RETRIES) {
-                throw new Error(
-                    `[SHOPS] Failed to get coffee shops after ${MAX_RETRIES} attempts: ${err.message}`,
-                );
-            }
-
-            const delay = retries * RETRY_DELAY;
-            console.error(
-                `[SHOPS] Error: ${err.message}. Retrying in ${delay}ms (${retries}/${MAX_RETRIES})`,
-            );
-            await sleep(delay);
+    try {
+        if (!token) {
+            const tokenResult = await getToken();
+            token = tokenResult.token;
+            console.log('[AUTH] Token obtained');
         }
+        console.log('[SHOPS] Fetching for shops.');
+        return await fetchWithRetry(
+            `${API_URL}/v1/coffee_shops`,
+            { method: 'GET' },
+            token,
+            '[SHOPS]',
+        );
+    } catch (err) {
+        throw new Error(
+            `[SHOPS] Failed to get coffee shops after ${MAX_RETRIES} attempts: ${err.message}`,
+        );
     }
 }
 
@@ -98,7 +82,9 @@ async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
 
             if (response.status === 401) {
                 console.log(`${logPrefix} Token expired, getting new token`);
-                throw { status: 401, needsNewToken: true };
+                throw new Error(
+                    `${logPrefix} ${response.status}: Unauthorized request, new token required.`,
+                );
             }
 
             if (response.status === 503 || response.status === 504) {
@@ -121,10 +107,6 @@ async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
             return await response.json();
         } catch (err) {
             clearTimeout(timeoutId);
-
-            if (err.needsNewToken) {
-                throw err;
-            }
 
             retries++;
             if (retries >= MAX_RETRIES) {
