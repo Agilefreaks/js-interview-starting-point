@@ -10,43 +10,17 @@ const REQUEST_TIMEOUT = 5000;
  * @returns {Promise<Array>} - Array of coffee shops
  */
 export async function getCoffeeShops() {
-    let token;
-    let retries = 0;
-
     try {
-        if (!token) {
-            const tokenResult = await getToken();
-            token = tokenResult.token;
-            console.log('[AUTH] Token obtained');
-        }
         console.log('[SHOPS] Fetching for shops.');
         return await fetchWithRetry(
             `${API_URL}/v1/coffee_shops`,
             { method: 'GET' },
-            token,
             '[SHOPS]',
         );
     } catch (err) {
         throw new Error(
             `[SHOPS] Failed to get coffee shops after ${MAX_RETRIES} attempts: ${err.message}`,
         );
-    }
-}
-
-/**
- * Get an authentication token from the API
- * @returns {Promise<{token: string}>} - Object containing the token
- */
-export async function getToken() {
-    try {
-        return await fetchWithRetry(
-            `${API_URL}/v1/tokens`,
-            { method: 'POST' },
-            null,
-            '[AUTH]',
-        );
-    } catch (err) {
-        throw new Error(`Failed to get authentication token: ${err.message}`);
     }
 }
 
@@ -58,33 +32,33 @@ export async function getToken() {
  * @param {string} logPrefix - Prefix for log messages
  * @returns {Promise<any>} - Parsed JSON response
  */
-async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
+
+let cachedToken = '';
+async function fetchWithRetry(url, options = {}, logPrefix = '') {
     let retries = 0;
-    let currentToken = token;
 
     while (retries < MAX_RETRIES) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
         try {
-            const urlWithToken = currentToken
-                ? `${url}?token=${currentToken}`
-                : url;
+            cachedToken ||= (await getToken()).token;
 
-            const response = await fetch(urlWithToken, {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
+            const response = await fetch(`${url}?token=${cachedToken}`, {
                 ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    ...options.headers,
+                },
                 signal: controller.signal,
             });
 
             clearTimeout(timeoutId);
-
             if (response.status === 401) {
+                cachedToken = '';
                 console.log(`${logPrefix} Token expired, getting new token`);
-                throw new Error(
-                    `${logPrefix} ${response.status}: Unauthorized request, new token required.`,
-                );
+                continue;
             }
 
             if (response.status === 503 || response.status === 504) {
@@ -103,8 +77,9 @@ async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
                     `${logPrefix} API error: ${response.status} ${response.statusText}`,
                 );
             }
-
-            return await response.json();
+            const data = await response.json();
+            console.log(data);
+            return data;
         } catch (err) {
             clearTimeout(timeoutId);
 
@@ -122,7 +97,21 @@ async function fetchWithRetry(url, options = {}, token = null, logPrefix = '') {
             await sleep(delay);
         }
     }
-    throw new Error(
-        `${logPrefix} Failed after ${MAX_RETRIES} attempts: Maximum retries reached`,
-    );
+}
+
+/**
+ * Get an authentication token from the API
+ * @returns {Promise<{token: string}>} - Object containing the token
+ */
+export async function getToken() {
+    try {
+        console.log('[AUTH] Fetching for token');
+        const response = await fetch(`${API_URL}/v1/tokens`, {
+            method: 'POST',
+        });
+
+        return await response.json();
+    } catch (err) {
+        throw new Error(`Failed to get authentication token: ${err.message}`);
+    }
 }
