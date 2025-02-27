@@ -22,12 +22,12 @@ export async function getNearestShops(position) {
         }
 
         const distances = coffeeShops.map(shop => ({
-            name: shop.name
+            name: shop.name,
             distance: calculateDistance(
                 { x: shop.x, y: shop.y },
                 validatedPosition,
-            )
-        });
+            ),
+        }));
 
         const closestThreeShops = getLowestThreeIndices(distances);
 
