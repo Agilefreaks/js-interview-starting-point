@@ -21,16 +21,12 @@ export async function getNearestShops(position) {
             throw new Error('Invalid data returned by API.');
         }
 
-        const distances = coffeeShops.map(shop => {
-            const distance = calculateDistance(
+        const distances = coffeeShops.map(shop => ({
+            name: shop.name
+            distance: calculateDistance(
                 { x: shop.x, y: shop.y },
                 validatedPosition,
-            );
-
-            return {
-                name: shop.name,
-                distance: distance,
-            };
+            )
         });
 
         const closestThreeShops = getLowestThreeIndices(distances);
