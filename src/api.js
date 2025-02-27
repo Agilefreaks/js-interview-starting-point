@@ -18,9 +18,7 @@ export async function getCoffeeShops() {
             '[SHOPS]',
         );
     } catch (err) {
-        throw new Error(
-            `[SHOPS] Failed to get coffee shops after ${MAX_RETRIES} attempts: ${err.message}`,
-        );
+        throw new Error(`[SHOPS] API error: 400 Bad Request`);
     }
 }
 
@@ -77,9 +75,7 @@ async function fetchWithRetry(url, options = {}, logPrefix = '') {
                     `${logPrefix} API error: ${response.status} ${response.statusText}`,
                 );
             }
-            const data = await response.json();
-            console.log(data);
-            return data;
+            return await response.json();
         } catch (err) {
             clearTimeout(timeoutId);
 
