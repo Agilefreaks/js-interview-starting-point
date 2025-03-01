@@ -1,10 +1,5 @@
 import { getCoffeeShops } from './api.js';
-import {
-  calculateDistance,
-  findNearestShops,
-  getLowestThreeIndices,
-  validatePosition
-} from './utils.js';
+import { findNearestShops, validatePosition } from './utils.js';
 
 /**
  * @param {Object} position
